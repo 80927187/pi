@@ -1,6 +1,6 @@
 /**
- * Agent loop that works with AgentMessage throughout.
- * Transforms to Message[] only at the LLM call boundary.
+ * 始终使用 AgentMessage 的代理循环。
+ * 仅在调用 LLM 时才转换为 Message[]。
  */
 
 import {
@@ -26,8 +26,8 @@ import type {
 export type AgentEventSink = (event: AgentEvent) => Promise<void> | void;
 
 /**
- * Start an agent loop with a new prompt message.
- * The prompt is added to the context and events are emitted for it.
+ * 使用新的提示消息启动代理循环。
+ * 提示会添加到上下文中，并为其发出相应事件。
  */
 export function agentLoop(
 	prompts: AgentMessage[],
@@ -55,12 +55,12 @@ export function agentLoop(
 }
 
 /**
- * Continue an agent loop from the current context without adding a new message.
- * Used for retries - context already has user message or tool results.
+ * 从当前上下文继续代理循环，不添加新消息。
+ * 用于重试——上下文中已经包含用户消息或工具结果。
  *
- * **Important:** The last message in context must convert to a `user` or `toolResult` message
- * via `convertToLlm`. If it doesn't, the LLM provider will reject the request.
- * This cannot be validated here since `convertToLlm` is only called once per turn.
+ * **重要：**上下文中的最后一条消息必须通过 `convertToLlm` 转换为 `user` 或 `toolResult` 消息。
+ * 否则 LLM 提供商会拒绝请求。
+ * 此处无法验证，因为每轮只会调用一次 `convertToLlm`。
  */
 export function agentLoopContinue(
 	context: AgentContext,
@@ -151,7 +151,7 @@ function createAgentStream(): EventStream<AgentEvent, AgentMessage[]> {
 }
 
 /**
- * Main loop logic shared by agentLoop and agentLoopContinue.
+ * agentLoop 和 agentLoopContinue 共用的主循环逻辑。
  */
 async function runLoop(
 	initialContext: AgentContext,
@@ -164,14 +164,14 @@ async function runLoop(
 	let currentContext = initialContext;
 	let config = initialConfig;
 	let lastCompletedTurn: PrepareNextTurnContext | undefined;
-	// Check for steering messages at start (user may have typed while waiting)
+	// 开始时检查引导消息（用户可能在等待期间输入了内容）
 	let pendingMessages: AgentMessage[] = (await config.getSteeringMessages?.()) || [];
 
-	// Outer loop: continues when queued follow-up messages arrive after agent would stop
+	// 外层循环：代理即将停止后若有排队的后续消息，则继续处理
 	while (true) {
 		let hasMoreToolCalls = true;
 
-		// Inner loop: process tool calls and steering messages
+		// 内层循环：处理工具调用和引导消息
 		while (hasMoreToolCalls || pendingMessages.length > 0) {
 			if (lastCompletedTurn) {
 				const nextTurnSnapshot = await config.prepareNextTurn?.(lastCompletedTurn);
@@ -188,16 +188,15 @@ async function runLoop(
 									: nextTurnSnapshot.thinkingLevel,
 					};
 				}
-				// Preparation can be long-running (for example, compaction). Pick up steering
-				// queued while it ran. Only poll again if the earlier poll returned nothing;
-				// otherwise one-at-a-time mode would deliver two messages in this turn.
+				// 准备过程可能运行很久（例如压缩上下文）。获取准备期间排队的引导消息。
+				// 只有在之前的轮询没有返回消息时才再次轮询；否则逐条处理模式会在本轮发送两条消息。
 				if (pendingMessages.length === 0) {
 					pendingMessages = (await config.getSteeringMessages?.()) || [];
 				}
 				await emit({ type: "turn_start" });
 			}
 
-			// Process pending messages (inject before next assistant response)
+			// 处理待处理消息（在下一次助手响应前注入）
 			if (pendingMessages.length > 0) {
 				for (const message of pendingMessages) {
 					await emit({ type: "message_start", message });
@@ -208,7 +207,7 @@ async function runLoop(
 				pendingMessages = [];
 			}
 
-			// Stream assistant response
+			// 流式获取助手响应
 			const message = await streamAssistantResponse(currentContext, config, signal, emit, streamFunction);
 			newMessages.push(message);
 
@@ -218,15 +217,14 @@ async function runLoop(
 				return;
 			}
 
-			// Check for tool calls
+			// 检查工具调用
 			const toolCalls = message.content.filter((c) => c.type === "toolCall");
 
 			const toolResults: ToolResultMessage[] = [];
 			hasMoreToolCalls = false;
 			if (toolCalls.length > 0) {
-				// A "length" stop means the output was cut off by the token limit, so
-				// every tool call in the message may carry truncated arguments. Fail
-				// them all instead of executing potentially borked calls.
+				// "length" 停止表示输出因达到令牌上限而被截断，因此消息中的每个工具调用
+				// 都可能携带不完整的参数。将它们全部标记为失败，避免执行可能损坏的调用。
 				const executedToolBatch =
 					message.stopReason === "length"
 						? await failToolCallsFromTruncatedMessage(toolCalls, emit)
@@ -257,15 +255,15 @@ async function runLoop(
 			pendingMessages = (await config.getSteeringMessages?.()) || [];
 		}
 
-		// Agent would stop here. Check for follow-up messages.
+		// 代理将在此处停止。检查是否有后续消息。
 		const followUpMessages = (await config.getFollowUpMessages?.()) || [];
 		if (followUpMessages.length > 0) {
-			// Set as pending so inner loop processes them
+			// 设为待处理消息，由内层循环处理
 			pendingMessages = followUpMessages;
 			continue;
 		}
 
-		// No more messages, exit
+		// 没有更多消息，退出
 		break;
 	}
 
@@ -273,8 +271,8 @@ async function runLoop(
 }
 
 /**
- * Stream an assistant response from the LLM.
- * This is where AgentMessage[] gets transformed to Message[] for the LLM.
+ * 从 LLM 流式获取助手响应。
+ * AgentMessage[] 在此处转换为供 LLM 使用的 Message[]。
  */
 async function streamAssistantResponse(
 	context: AgentContext,
@@ -283,23 +281,23 @@ async function streamAssistantResponse(
 	emit: AgentEventSink,
 	streamFunction: StreamFn,
 ): Promise<AssistantMessage> {
-	// Apply context transform if configured (AgentMessage[] → AgentMessage[])
+	// 如已配置，则应用上下文转换（AgentMessage[] → AgentMessage[]）
 	let messages = context.messages;
 	if (config.transformContext) {
 		messages = await config.transformContext(messages, signal);
 	}
 
-	// Convert to LLM-compatible messages (AgentMessage[] → Message[])
+	// 转换为 LLM 兼容的消息（AgentMessage[] → Message[]）
 	const llmMessages = await config.convertToLlm(messages);
 
-	// Build LLM context
+	// 构建 LLM 上下文
 	const llmContext: Context = {
 		systemPrompt: context.systemPrompt,
 		messages: llmMessages,
 		tools: context.tools,
 	};
 
-	// Resolve API key (important for expiring tokens)
+	// 解析 API 密钥（对会过期的令牌很重要）
 	const resolvedApiKey =
 		(config.getApiKey ? await config.getApiKey(config.model.provider) : undefined) || config.apiKey;
 
@@ -370,11 +368,10 @@ async function streamAssistantResponse(
 }
 
 /**
- * Fail all tool calls from an assistant message that was truncated by the
- * output token limit. Streamed tool-call arguments are finalized with a
- * best-effort JSON salvage parser, so a truncated message can yield tool calls
- * whose arguments parse and validate but are silently incomplete. None of them
- * are safe to execute; report each as an error so the model can re-issue them.
+ * 将因输出令牌上限而截断的助手消息中的所有工具调用标记为失败。
+ * 流式工具调用参数会通过尽力而为的 JSON 修复解析器完成解析，因此截断的消息
+ * 可能产生参数能够解析并通过验证、却悄然不完整的工具调用。这些调用均不应执行；
+ * 将每个调用报告为错误，以便模型重新发起完整调用。
  */
 async function failToolCallsFromTruncatedMessage(
 	toolCalls: AgentToolCall[],
@@ -404,7 +401,7 @@ async function failToolCallsFromTruncatedMessage(
 }
 
 /**
- * Execute tool calls from an assistant message.
+ * 执行助手消息中的工具调用。
  */
 async function executeToolCalls(
 	currentContext: AgentContext,
@@ -786,8 +783,8 @@ function createToolResultMessage(finalized: FinalizedToolCallOutcome): ToolResul
 		role: "toolResult",
 		toolCallId: finalized.toolCall.id,
 		toolName: finalized.toolCall.name,
-		// Untyped tools (JS extensions) can return results without content; normalize
-		// so the null never enters session history or provider payloads.
+		// 无类型工具（JS 扩展）可能返回不含 content 的结果；在此统一规范化，
+		// 避免 null 进入会话历史或提供商载荷。
 		content: finalized.result.content ?? [],
 		details: finalized.result.details,
 		usage: finalized.result.usage,
