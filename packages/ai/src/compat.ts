@@ -1,13 +1,12 @@
 /**
- * Temporary compatibility entrypoint preserving the old global pi-ai API
- * surface: api-dispatch `stream()`/`complete()` with env API key injection,
- * the api-registry, generated catalog reads (`getModel`/`getModels`/
- * `getProviders`), per-API lazy stream wrappers, and image generation.
+ * 临时兼容入口，保留旧的全局 pi-ai API 表面：带环境 API 密钥注入的
+ * api-dispatch `stream()`/`complete()`、api-registry、生成的目录读取
+ * （`getModel`/`getModels`/`getProviders`）、各 API 的懒加载流包装器，
+ * 以及图像生成。
  *
- * Existing apps switch imports from "@earendil-works/pi-ai" to
- * "@earendil-works/pi-ai/compat" unchanged; new code uses `createModels()`
- * and the provider factories. This module is deleted with the coding-agent
- * ModelManager migration.
+ * 现有应用只需把导入从 "@earendil-works/pi-ai" 改为
+ * "@earendil-works/pi-ai/compat"，其余代码无需改动；新代码请使用 `createModels()`
+ * 和各 provider 工厂。随着 coding-agent 的 ModelManager 迁移，本模块将被删除。
  */
 
 export * from "./api/anthropic-messages.lazy.ts";
@@ -59,13 +58,13 @@ import type {
 	StreamOptions,
 } from "./types.ts";
 
-/** @deprecated Static catalog read. Use `getBuiltinModel` from "@earendil-works/pi-ai/providers/all" or `Models.getModel()`. */
+/** @deprecated 静态目录读取。请使用 "@earendil-works/pi-ai/providers/all" 中的 `getBuiltinModel` 或 `Models.getModel()`。 */
 export const getModel = getBuiltinModel;
 
-/** @deprecated Static catalog read. Use `getBuiltinModels` from "@earendil-works/pi-ai/providers/all" or `Models.getModels()`. */
+/** @deprecated 静态目录读取。请使用 "@earendil-works/pi-ai/providers/all" 中的 `getBuiltinModels` 或 `Models.getModels()`。 */
 export const getModels = getBuiltinModels;
 
-/** @deprecated Static catalog read. Use `getBuiltinProviders` from "@earendil-works/pi-ai/providers/all" or `Models.getProviders()`. */
+/** @deprecated 静态目录读取。请使用 "@earendil-works/pi-ai/providers/all" 中的 `getBuiltinProviders` 或 `Models.getProviders()`。 */
 export const getProviders = getBuiltinProviders;
 
 export type ApiStreamFunction = (
@@ -191,9 +190,8 @@ const BUILTIN_APIS: [Api, ProviderStreams][] = [
 const builtinApiProviderInstances = new Map<Api, ReturnType<typeof getApiProvider>>();
 
 /**
- * Registers the builtin API implementations into the api-registry without
- * clobbering existing entries: compat may load after a test or extension has
- * already registered an override for a builtin api id.
+ * 将内置 API 实现注册到 api-registry，且不覆盖已有条目：compat 可能在
+ * 测试或扩展已为某个内置 api id 注册了覆盖实现之后才加载。
  */
 export function registerBuiltInApiProviders(): void {
 	for (const [api, streams] of BUILTIN_APIS) {
