@@ -1,0 +1,243 @@
+{
+  "nodeData": {
+    "id": "root",
+    "topic": "pi",
+    "root": true,
+    "children": [
+      {
+        "topic": "多模型适配",
+        "id": "095b00a3e823f8c7",
+        "children": [
+          {
+            "topic": "通用的模型的消息结构",
+            "id": "095b035192ee66e3",
+            "children": [
+              {
+                "topic": "user用户消息",
+                "id": "095e45158806c6a5",
+                "children": [
+                  {
+                    "topic": "文本信息",
+                    "id": "095f68518223b764"
+                  },
+                  {
+                    "topic": "图片信息",
+                    "id": "095f695a92e2d329"
+                  }
+                ]
+              },
+              {
+                "topic": "模型(助手)消息",
+                "id": "095e4bb54944989e",
+                "children": [
+                  {
+                    "topic": "对话文本信息",
+                    "id": "095f6cb021e4ae61"
+                  },
+                  {
+                    "topic": "思考信息",
+                    "id": "095f78ce9ad6e01f"
+                  },
+                  {
+                    "topic": "工具调用",
+                    "id": "095f6f31037d316f"
+                  }
+                ]
+              },
+              {
+                "topic": "工具调用结果",
+                "id": "095e4f1aca10faad",
+                "children": []
+              }
+            ]
+          },
+          {
+            "topic": "依据Model对象选择适配协议",
+            "id": "09605edd1f29657f",
+            "children": [
+              {
+                "topic": "供应商适配：\n在API协议没有被外部覆盖，且provider对应的时候选用|\n**作用**：定义apikey的变量名，包含的api，以及对api进行包装\n对stream和streamSimple函数进行包装，额外增加爱请求头参数等\n传输各个供应商专有的密钥",
+                "id": "095b3f89e1848f17"
+              },
+              {
+                "topic": "API协议适配",
+                "id": "095b3f63e9107700",
+                "children": [
+                  {
+                    "topic": "初始化的时候加载几个BUILDIN API",
+                    "id": "095fa0151cd0e7f4"
+                  },
+                  {
+                    "topic": "api适配函数",
+                    "id": "095fa8635a253db2",
+                    "children": [
+                      {
+                        "topic": "stream函数：",
+                        "id": "095fbd1b96d2e07b",
+                        "children": [
+                          {
+                            "topic": "1. 通用消息数组和底层模型消息数组相互转化适配\n2. 翻译AssistantMessageEventStream，是一个可异步迭代的对象（asynciterable）\n3. 迭代返回具体的消息（通用型），循环迭代只在内部content中追加。所以message数组最终只会新增一条assistant消息，而不是多条\n```js\ncontext.messages = [\r\n    userMessage,\r    {\r      role: \"assistant\",          // 当前唯一的 assistant\r      消息\r      content: [\r        { type: \"text\", text: \"...\" },\r        { type: \"thinking\", thinking: \"...\" },\r        { type: \"text\", text: \"...\" }\r      ]\r    }\r  ];```",
+                            "id": "09b4fad18af049b9"
+                          }
+                        ]
+                      },
+                      {
+                        "topic": "streamSimple函数",
+                        "id": "095fbeafddcbaa7a"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "expanded": true
+      },
+      {
+        "topic": "Agent程序调用链图",
+        "id": "095bf7c1b9bd1053",
+        "children": [
+          {
+            "topic": "sdk",
+            "id": "095b01d62c4f78c6",
+            "children": [
+              {
+                "topic": "session",
+                "id": "095fdfff1ff19c21",
+                "children": [
+                  {
+                    "topic": "Agent",
+                    "id": "095fe19c99a0abcf",
+                    "children": [
+                      {
+                        "topic": "AgentLoop",
+                        "id": "095fe5589b4c1d15",
+                        "children": [
+                          {
+                            "topic": "特征",
+                            "id": "0961cc71638f9f7c",
+                            "children": [
+                              {
+                                "topic": "无状态",
+                                "id": "095fe8a75784acc3"
+                              },
+                              {
+                                "topic": "处理其中一轮对话",
+                                "id": "095fe9c6d6b67a88"
+                              }
+                            ]
+                          },
+                          {
+                            "topic": "实现",
+                            "id": "0961c5fae8f87b26",
+                            "children": []
+                          }
+                        ]
+                      },
+                      {
+                        "topic": "内含全程消息的记录",
+                        "id": "096016a61982d335"
+                      }
+                    ]
+                  },
+                  {
+                    "topic": "消息的监听处理",
+                    "id": "09b9d7ef39f585d6",
+                    "children": [
+                      {
+                        "topic": "允许外部扩展的扩展事件，\nthis._extensionRunner",
+                        "id": "09b9d9b678a98e24"
+                      },
+                      {
+                        "topic": "session自己的消息消费者",
+                        "id": "09bcfa0f58228d09"
+                      }
+                    ]
+                  }
+                ],
+                "expanded": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "topic": "扩展机制",
+        "id": "095b02e62cf5a2fd"
+      },
+      {
+        "topic": "消息事件机制",
+        "id": "095bf6ea2b667a9d"
+      },
+      {
+        "topic": "工具",
+        "id": "096041b9184fcc1a"
+      }
+    ]
+  },
+  "arrows": [
+    {
+      "id": "095fd0e96e58b58f",
+      "label": "调用",
+      "from": "095fbeafddcbaa7a",
+      "to": "095fbd1b96d2e07b",
+      "delta1": {
+        "x": 90,
+        "y": -38
+      },
+      "delta2": {
+        "x": 36,
+        "y": -52
+      }
+    }
+  ],
+  "summaries": [
+    {
+      "id": "09b466ff8f77bd8b",
+      "parent": "095fa8635a253db2",
+      "start": 0,
+      "end": 1,
+      "label": "`streamSimple`, `stream`区别在于：streamSimple的参数是通用的大模型参数。对参数和参数的默认值做了处理，转化为了具体的参数，然后调用stream函数"
+    }
+  ],
+  "direction": 1,
+  "theme": {
+    "name": "午夜紫",
+    "type": "dark",
+    "palette": [
+      "#6e79e0",
+      "#3b3f5c",
+      "#6e79e0",
+      "#3b3f5c",
+      "#6e79e0",
+      "#3b3f5c",
+      "#6e79e0",
+      "#3b3f5c",
+      "#6e79e0",
+      "#3b3f5c"
+    ],
+    "cssVar": {
+      "--bgcolor": "#0f1011",
+      "--color": "#a6a9bd",
+      "--main-color": "#d7d9e6",
+      "--main-bgcolor": "#1a1b22",
+      "--main-bgcolor-transparent": "#1a1b22",
+      "--main-border": "1px solid #2b2d3a",
+      "--root-color": "#ffffff",
+      "--root-bgcolor": "#6e79e0",
+      "--root-border-color": "transparent",
+      "--accent-color": "#6e79e0",
+      "--selected": "#6e79e0",
+      "--panel-color": "#d7d9e6",
+      "--panel-bgcolor": "#1a1b22",
+      "--panel-border-color": "#2b2d3a"
+    }
+  },
+  "compact": false,
+  "themeTemplate": "auroraDark",
+  "backgroundPattern": "grid",
+  "bgPatternColor": "#808080",
+  "bgPatternOpacity": 10,
+  "lineStyle": "curve"
+}
