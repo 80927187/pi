@@ -107,7 +107,7 @@
                 "id": "095fdfff1ff19c21",
                 "children": [
                   {
-                    "topic": "Agent",
+                    "topic": "内部调用：Agent",
                     "id": "095fe19c99a0abcf",
                     "children": [
                       {
@@ -126,7 +126,8 @@
                                 "topic": "处理其中一轮对话",
                                 "id": "095fe9c6d6b67a88"
                               }
-                            ]
+                            ],
+                            "expanded": true
                           },
                           {
                             "topic": "实现",
@@ -146,12 +147,46 @@
                     "id": "09b9d7ef39f585d6",
                     "children": [
                       {
-                        "topic": "允许外部扩展的扩展事件，\nthis._extensionRunner",
-                        "id": "09b9d9b678a98e24"
+                        "topic": "注册 this.agent.subscribe 订阅\nthis._handleAgentEvent 处理逻辑",
+                        "id": "09f8313f96dd74ce",
+                        "children": [
+                          {
+                            "topic": "检测到消费了执行队列中的任务，更新执行队列，并且汇报更新情况\n队列分为：\n1. this._steeringMessages 表示用户在agent执行过程中发送的消息\n2. _followUpMessages 表示用户在agent执行结束后发送的消息",
+                            "id": "09f8e5e9102ae5da"
+                          },
+                          {
+                            "topic": "调用：\n允许外部扩展的扩展事件，\nthis._extensionRunner",
+                            "id": "09b9d9b678a98e24"
+                          },
+                          {
+                            "topic": "调用：\nsession自己的消息消费者",
+                            "id": "09bcfa0f58228d09"
+                          },
+                          {
+                            "topic": "持久化消息",
+                            "id": "09f8c1b55bc57b91",
+                            "children": [
+                              {
+                                "topic": "通过sessionManager存储\n调用函数\nappendCustomMessageEntry\nappendMessage",
+                                "id": "09f955d6d235a604"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "topic": "sessionmanager",
+                    "id": "09fa003268fa52ea",
+                    "children": [
+                      {
+                        "topic": "初始化位置：sdk.ts",
+                        "id": "09fa0e6260b2a8c9"
                       },
                       {
-                        "topic": "session自己的消息消费者",
-                        "id": "09bcfa0f58228d09"
+                        "topic": "功能：单个活动会话的存储与状态管理器",
+                        "id": "09fa6ce789b9385c"
                       }
                     ]
                   }
