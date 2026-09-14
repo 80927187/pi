@@ -187,6 +187,60 @@
                       {
                         "topic": "功能：单个活动会话的存储与状态管理器",
                         "id": "09fa6ce789b9385c"
+                      },
+                      {
+                        "topic": "消息管理",
+                        "id": "0a067b105b00f01a",
+                        "children": [
+                          {
+                            "topic": "本地消息管理",
+                            "id": "0a068109695aacbd",
+                            "children": [
+                              {
+                                "topic": "JSONL格式，第一行放Session，后面放具体的消息，一个消息占一行\n消息中包含id ，parentid ，在用户消息和特殊消息（如压缩，切换分支的总结节点上）。",
+                                "id": "0a0689dd9e343cf5"
+                              }
+                            ]
+                          },
+                          {
+                            "topic": "内存消息管理",
+                            "id": "0a06881436592d84",
+                            "children": [
+                              {
+                                "topic": "使用数组存储消息，和本地保存的是同一个数组结构",
+                                "id": "0a067e189567e508"
+                              },
+                              {
+                                "topic": "使用map优化索引，方便通过id迅速找到对应节点",
+                                "id": "0a06c8d2335ab109"
+                              },
+                              {
+                                "topic": "分支切换功能：切换分支后，会在多叉树增加一个分支，并会增加branchSummary节点，用于记录从那个节点切换过来。从父节点是哪个节点，以及之前节点的总结信息。从会话进行继续进行对话的时候，调用sessionEntryToContextMessages把树中的每个节点（压缩用的总结节点逻辑不同，不会把压缩节点前面的节点给算在树中）都转化为AgentMessage，在Agent loop 调用convertToLlm（在packages\\coding-agent\\src\\core\\messages.ts 中）的时候，将特殊节点（例如总结节点，压缩节点等）转化为原生的节点。",
+                                "id": "0a06cd95795e7708"
+                              },
+                              {
+                                "topic": "上下文压缩功能",
+                                "id": "0a075260c0a17ba7",
+                                "children": [
+                                  {
+                                    "topic": "触发压缩的时机",
+                                    "id": "0a0831c0bddfb57d",
+                                    "children": [
+                                      {
+                                        "topic": "一次agent loop回答完毕后：\npackages/coding-agent/src/core/agent-\rsession.ts:1112",
+                                        "id": "0a0832ee22e017ed"
+                                      },
+                                      {
+                                        "topic": "New Node",
+                                        "id": "0a086370fd9ff853"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
                       }
                     ]
                   }
