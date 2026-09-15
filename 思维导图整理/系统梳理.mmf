@@ -139,6 +139,35 @@
                       {
                         "topic": "内含全程消息的记录",
                         "id": "096016a61982d335"
+                      },
+                      {
+                        "topic": "steeringQueue",
+                        "id": "0a4b7066984482d3",
+                        "children": [
+                          {
+                            "topic": "功能：允许Agent当前任务没有完全结束的时候，接受用户的新指令",
+                            "id": "0a4bbb021dbbc80e"
+                          },
+                          {
+                            "topic": "在agent.ts定义的createLoopConfig，里面定义的getSteeringMessages方法从这个队列中获取所有的队列内容。\nagent-loop.ts在每次loop开始的时候，取数组里的数字塞入到上下文中",
+                            "id": "0a4bc3ef565f2f8a"
+                          }
+                        ]
+                      },
+                      {
+                        "topic": "followUpQueue",
+                        "id": "0a4c3cd092a941b3",
+                        "children": [
+                          {
+                            "topic": "功能：在当前Agentloop执行结束的时候，继续执行队列后续的指令。\n在agent-loop的循环的末尾会去检查这个队列。也是从createLoopConfig去调用",
+                            "id": "0a4c3f6da7234f1d"
+                          },
+                          {
+                            "topic": "ctrl + Q 可以支持用户使用这种模式发送消息",
+                            "id": "0a4d42e629bc72b6"
+                          }
+                        ],
+                        "expanded": true
                       }
                     ]
                   },
@@ -231,10 +260,52 @@
                                         "id": "0a0832ee22e017ed"
                                       },
                                       {
-                                        "topic": "New Node",
-                                        "id": "0a086370fd9ff853"
+                                        "topic": "用户手动压缩 /compact",
+                                        "id": "0a086370fd9ff853",
+                                        "children": [
+                                          {
+                                            "topic": "New Node",
+                                            "id": "0a50881d471e6724"
+                                          }
+                                        ]
                                       }
                                     ]
+                                  },
+                                  {
+                                    "topic": "压缩的方式",
+                                    "id": "0a4f26ae077492a6"
+                                  }
+                                ]
+                              },
+                              {
+                                "topic": "this._steeringMessages",
+                                "id": "0a4a9b19db63e5c1",
+                                "children": [
+                                  {
+                                    "topic": "功能：单纯用于ui中，显示还有什么消息（loop每轮循环开始）待处理",
+                                    "id": "0a4aecc607628660"
+                                  },
+                                  {
+                                    "topic": "等待消息开始处理后，从队列中移除",
+                                    "id": "0a4b5185d964abd6"
+                                  },
+                                  {
+                                    "topic": "真正的待处理消息存在于agent的steeringQueue对象中",
+                                    "id": "0a4b5ba383647df2"
+                                  }
+                                ]
+                              },
+                              {
+                                "topic": "_followUpMessages",
+                                "id": "0a4a9eebd2a9f64f",
+                                "children": [
+                                  {
+                                    "topic": "功能：ui显示，还有什么消息（loop完成后）待处理",
+                                    "id": "0a4ef6bdb211e6c1"
+                                  },
+                                  {
+                                    "topic": "其余和_steeringMessages类似",
+                                    "id": "0a4efde53ea76bcb"
                                   }
                                 ]
                               }
