@@ -168,6 +168,30 @@
                           }
                         ],
                         "expanded": true
+                      },
+                      {
+                        "topic": "runAgentLoopContinue",
+                        "id": "0a9995227d61e7c3",
+                        "children": [
+                          {
+                            "topic": "用于继续循环",
+                            "id": "0a99978bd28425d0"
+                          },
+                          {
+                            "topic": "主要场景",
+                            "id": "0a999a705468e1bb",
+                            "children": [
+                              {
+                                "topic": "在上下文溢出，报错后，继续loop",
+                                "id": "0a999b7a1a7357f1"
+                              },
+                              {
+                                "topic": "清空agent_end 事件之后的消息",
+                                "id": "0a999f1d4397c3ff"
+                              }
+                            ]
+                          }
+                        ]
                       }
                     ]
                   },
