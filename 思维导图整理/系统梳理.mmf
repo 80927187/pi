@@ -268,12 +268,102 @@
                                             "id": "0a50881d471e6724"
                                           }
                                         ]
+                                      },
+                                      {
+                                        "topic": "自动阈值压缩",
+                                        "id": "0a7dd96a426a911f",
+                                        "children": [
+                                          {
+                                            "topic": "条件：contextTokens > contextWindow - reserveTokens",
+                                            "id": "0a7df0bfd1900e7b"
+                                          },
+                                          {
+                                            "topic": "时机",
+                                            "id": "0a7df27a504a4c19",
+                                            "children": [
+                                              {
+                                                "topic": "多轮 agent 回合中，下一次 assistant 响应前",
+                                                "id": "0a7e137e84f4c213",
+                                                "children": [
+                                                  {
+                                                    "topic": "agent-loop在loop开始的时候调用await config.prepareNextTurn?.(lastCompletedTurn)",
+                                                    "id": "0a7f2c488f01e346"
+                                                  },
+                                                  {
+                                                    "topic": "config.prepareNextTurn是在agent.ts中定义的。\n调用的是this.prepareNextTurnWithContext",
+                                                    "id": "0a7f3e37ce3e376d"
+                                                  },
+                                                  {
+                                                    "topic": "this.prepareNextTurnWithContext 实在agent-session.ts中定义的\n本质调用的是_compactBeforeNextAssistantResponse",
+                                                    "id": "0a7fc4cbe3a6b9ce"
+                                                  },
+                                                  {
+                                                    "topic": "_compactBeforeNextAssistantResponse()\n   → shouldCompact()\n   → _runAutoCompaction(\"threshold\", false)",
+                                                    "id": "0a7e246adc22a9e2"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "topic": "接受新用户输入后，调用agent之前",
+                                                "id": "0a7e21dec225a459",
+                                                "children": [
+                                                  {
+                                                    "topic": "agent-session.ts 的prompt函数中\n调用了this._checkCompaction",
+                                                    "id": "0a7ff37b4e4be4cd"
+                                                  },
+                                                  {
+                                                    "topic": "this._checkCompaction\n    -> _runAutoCompaction",
+                                                    "id": "0a7ffcad3d2ffa1c"
+                                                  }
+                                                ]
+                                              },
+                                              {
+                                                "topic": "New Node",
+                                                "id": "0a804e1355e34532"
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "topic": "自动溢出恢复",
+                                        "id": "0a80791e8cc21a48",
+                                        "children": [
+                                          {
+                                            "topic": "在 assistant 响应已经返回后，根据响应判断发生了上下文溢出或异常截断（这里是启发式推测，他的上下文可能不够，因此也做一次压缩）",
+                                            "id": "0a807eecdf2d22ec",
+                                            "children": [
+                                              {
+                                                "topic": "New Node",
+                                                "id": "0a81d4c8c688535f"
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "topic": "时机",
+                                            "id": "0a8088f9e30f885e",
+                                            "children": [
+                                              {
+                                                "topic": "New Node",
+                                                "id": "0a808c62c6ac5082"
+                                              }
+                                            ]
+                                          },
+                                          {
+                                            "topic": "响应成功，但是上下文已经溢出，会进行一轮压缩",
+                                            "id": "0a81cdffcd0080a2"
+                                          }
+                                        ]
                                       }
                                     ]
                                   },
                                   {
                                     "topic": "压缩的方式",
                                     "id": "0a4f26ae077492a6"
+                                  },
+                                  {
+                                    "topic": "压缩函数：agent-session.ts 下的compact",
+                                    "id": "0a7c528aceb58bdd"
                                   }
                                 ]
                               },
@@ -333,6 +423,33 @@
       {
         "topic": "工具",
         "id": "096041b9184fcc1a"
+      },
+      {
+        "topic": "用户对话程序链路",
+        "id": "0a95ec51dbdf535b",
+        "direction": 1,
+        "children": [
+          {
+            "topic": "用户从0开始一次对话",
+            "id": "0a95f02c93f128a1",
+            "children": [
+              {
+                "topic": "用户按 Enter\n  ↓\nEditor.handleInput()\n  ↓\nEditor.submitValue()\n  ↓\nInteractiveMode.defaultEditor.onSubmit(text)\n  ↓\nInteractiveMode.getUserInput() 的 Promise 被 resolve\n  ↓\nInteractiveMode.run() 主循环取得 userInput\n  ↓\nAgentSession.prompt(userInput)\n  ↓\nAgentSession._runAgentPrompt(messages)\n  ↓\nAgent.prompt(messages)\n  ↓\nAgent.runPromptMessages(messages)\n  ↓\nAgent.runWithLifecycle(...)\n  ↓\nrunAgentLoop(...)\n  ↓\nrunLoop(...)",
+                "id": "0a95f9a707d08b01"
+              }
+            ]
+          },
+          {
+            "topic": "用户在已有对话的基础上开始一次对话",
+            "id": "0a95f4d59c2fbd88",
+            "children": [
+              {
+                "topic": "Editor.submitValue()\n  → InteractiveMode.onSubmit\n  → getUserInput()\n  → InteractiveMode.run()\n  → AgentSession.prompt()\n  → _runAgentPrompt()\n  → Agent.prompt()\n  → runPromptMessages()\n  → runAgentLoop()\n  → runLoop()",
+                "id": "0a98bd8c73494859"
+              }
+            ]
+          }
+        ]
       }
     ]
   },
