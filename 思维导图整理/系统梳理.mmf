@@ -298,7 +298,7 @@
                                         "id": "0a7dd96a426a911f",
                                         "children": [
                                           {
-                                            "topic": "条件：contextTokens > contextWindow - reserveTokens",
+                                            "topic": "条件：contextTokens > contextWindow - reserveTokens\n当前的上下文大小 >\n当前模型能够容纳的最大上下文总量 +\n为了下一次模型回答而提前预留的 token 数。",
                                             "id": "0a7df0bfd1900e7b"
                                           },
                                           {
@@ -342,8 +342,22 @@
                                                 ]
                                               },
                                               {
-                                                "topic": "New Node",
-                                                "id": "0a804e1355e34532"
+                                                "topic": "agent loop结束后,进入agentsession._handlePostAgentRun\n判断是否需要重试",
+                                                "id": "0a804e1355e34532",
+                                                "children": [
+                                                  {
+                                                    "topic": "可以直接重试的错误，直接返回true，发起重试（调用continue）",
+                                                    "id": "0aeb0c611bb7d1ff"
+                                                  },
+                                                  {
+                                                    "topic": "需要压缩后重试的错误，压缩有返回true，直接重试（调用continue）",
+                                                    "id": "0af1bcba695d4446"
+                                                  },
+                                                  {
+                                                    "topic": "不需要重试，函数走到结束自然退出",
+                                                    "id": "0af1c2efca82bf3e"
+                                                  }
+                                                ]
                                               }
                                             ]
                                           }
@@ -356,22 +370,7 @@
                                           {
                                             "topic": "在 assistant 响应已经返回后，根据响应判断发生了上下文溢出或异常截断（这里是启发式推测，他的上下文可能不够，因此也做一次压缩）",
                                             "id": "0a807eecdf2d22ec",
-                                            "children": [
-                                              {
-                                                "topic": "New Node",
-                                                "id": "0a81d4c8c688535f"
-                                              }
-                                            ]
-                                          },
-                                          {
-                                            "topic": "时机",
-                                            "id": "0a8088f9e30f885e",
-                                            "children": [
-                                              {
-                                                "topic": "New Node",
-                                                "id": "0a808c62c6ac5082"
-                                              }
-                                            ]
+                                            "children": []
                                           },
                                           {
                                             "topic": "响应成功，但是上下文已经溢出，会进行一轮压缩",
@@ -383,7 +382,60 @@
                                   },
                                   {
                                     "topic": "压缩的方式",
-                                    "id": "0a4f26ae077492a6"
+                                    "id": "0a4f26ae077492a6",
+                                    "children": [
+                                      {
+                                        "topic": "从后往前找消息切分的位置：找打大约20000token的位置，文字转化本地估算token，图片按照4800字符估算。",
+                                        "id": "0af2f461c44a17e7"
+                                      },
+                                      {
+                                        "topic": "切分点（cut point）可以放在：\n\n  - 用户消息\n  - 助手消息\n  - Bash 执行消息\n  - 自定义消息\n  - 分支摘要、旧压缩摘要\n\n  但绝不会直接切在工具结果（tool result）上，避免工具调用和对应结果失去关联。",
+                                        "id": "0af30537861b7e59",
+                                        "children": [
+                                          {
+                                            "topic": "切分点的聪明之处：这里由于把整个助手在一次输出的所有的消息进行了打包（打包为一个助手消息），所以这里切分的时候就绝对不会把一次助手的输出给切分开来。从而很好的保证了协议的正确性",
+                                            "id": "0af314094fc11b00"
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "topic": "发起独立的摘要模型调用",
+                                        "id": "0af3132a76c4e172",
+                                        "children": [
+                                          {
+                                            "topic": "默认使用当前模型（不切换）",
+                                            "id": "0af3a5602ed51594"
+                                          },
+                                          {
+                                            "topic": "默认压缩没有保缓存（这里个人感觉可以优化）",
+                                            "id": "0af3a79cc537643c"
+                                          }
+                                        ],
+                                        "expanded": true
+                                      },
+                                      {
+                                        "topic": "如果是切在回合中，则上下文切分为两段进行压缩，共产生两份摘要：\n1. 回合前的所有内容做一次压缩\n2. 回合的前半段单独做一次压缩\n\n这两次压缩的结果，用字符串拼接起来，放到一个压缩节点（CompactionEntry）。这样才符合上下文合成的要求：从最新的上下文，一致往旧了取，直到压缩节点处，作为整个上下文",
+                                        "id": "0af3bea53e6e9def",
+                                        "children": [
+                                          {
+                                            "topic": "注意其中回合指：\n  > 从一条用户消息开始，包括之后所有的 assistant 回复、工具调用和工具结果，直到下一条用户消息出现之前。",
+                                            "id": "0af3d1874c7f3c00"
+                                          }
+                                        ]
+                                      },
+                                      {
+                                        "topic": "连续压缩的情况：\n只是常见的滚动摘要，把上一次压缩好的信息，和这一次需要压缩的信息放到一起进行压缩",
+                                        "id": "0af4013bbe120e7f"
+                                      },
+                                      {
+                                        "topic": "压缩后在内存中追加CompactionEntry节点，在文件中追加新的JSONL",
+                                        "id": "0af575aef4cf37ba"
+                                      },
+                                      {
+                                        "topic": "下一次agent消息合成，会使用最新的消息节点往前追溯，直到遇到压缩节点停下来，然后组成完整的上下文",
+                                        "id": "0af580324a6589b8"
+                                      }
+                                    ]
                                   },
                                   {
                                     "topic": "压缩函数：agent-session.ts 下的compact",
