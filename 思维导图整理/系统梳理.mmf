@@ -498,7 +498,64 @@
       },
       {
         "topic": "工具",
-        "id": "096041b9184fcc1a"
+        "id": "096041b9184fcc1a",
+        "children": [
+          {
+            "topic": "分类",
+            "id": "0b01531a8e57da15",
+            "children": [
+              {
+                "topic": "内置工具",
+                "id": "0b0154020b4783b0",
+                "children": [
+                  {
+                    "topic": "定义入口在：packages\\coding-agent\\src\\core\\tools\\index.ts",
+                    "id": "0b01ae9e434f79dd"
+                  },
+                  {
+                    "topic": "通过createToolDefinition创建",
+                    "id": "0b01b0fd0eb742e1"
+                  }
+                ]
+              },
+              {
+                "topic": "扩展工具",
+                "id": "0b01552058aa0b77",
+                "children": [
+                  {
+                    "topic": "通过pi.registerTool注册，对应接口定义在packages\\coding-agent\\src\\core\\extensions\\loader.ts",
+                    "id": "0b01c093ccda55c3"
+                  },
+                  {
+                    "topic": "作用：Pi作为主程序的时候，自动扫描并加载的工具，可以是从当前目录下的文件夹：.pi/extensions/hello.ts。也可以从全局~/.pi/agent/extensions/ 下加载（个人感觉和skill之类的比较像）",
+                    "id": "0b03946585e0040c",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "topic": "SDK工具",
+                "id": "0b0157c179aadb22",
+                "children": [
+                  {
+                    "topic": "作用：外部宿主去使用pi的时候，手动注册进去的",
+                    "id": "0b03cfb83aca557c"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "topic": "调用链路",
+            "id": "0b01655408121c4a",
+            "children": [
+              {
+                "topic": "内置工具 / 扩展工具 / SDK 工具\n                ↓\n          AgentSession 注册表\n                ↓\n         activeToolNames 激活列表\n                ↓\n         发送给模型的工具 schema\n                ↓\n        模型 tool_call 按名称查找\n                ↓\n         参数校验 → execute() 执行",
+                "id": "0b0177dd366d2ed0"
+              }
+            ]
+          }
+        ]
       },
       {
         "topic": "用户对话程序链路",
